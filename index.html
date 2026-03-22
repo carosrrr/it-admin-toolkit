@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Admin Toolkit - Caio Santana</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>IT Admin Toolkit</h1>
+    <p>by caio santana</p>
+  </div>
+  <div class="nav-section">Network</div>
+  <div class="nav-item active" data-tool="subnet"><span class="nav-icon">#</span><span>Subnet Calculator</span></div>
+  <div class="nav-item" data-tool="ip"><span class="nav-icon">&lt;&gt;</span><span>IP Converter</span></div>
+  <div class="nav-item" data-tool="ports"><span class="nav-icon">:</span><span>Port Lookup</span></div>
+  <div class="nav-section">Utilities</div>
+  <div class="nav-item" data-tool="password"><span class="nav-icon">*</span><span>Password Generator</span></div>
+  <div class="nav-item" data-tool="base64"><span class="nav-icon">B</span><span>Base64 Codec</span></div>
+  <div class="nav-item" data-tool="json"><span class="nav-icon">{}</span><span>JSON Formatter</span></div>
+  <div class="nav-item" data-tool="regex"><span class="nav-icon">.*</span><span>Regex Tester</span></div>
+  <div class="nav-section">Reference</div>
+  <div class="nav-item" data-tool="cheat"><span class="nav-icon">&gt;_</span><span>CLI Cheatsheet</span></div>
+  <div class="nav-item" data-tool="sla"><span class="nav-icon">%</span><span>SLA Calculator</span></div>
+  <div class="nav-item" data-tool="diff"><span class="nav-icon">~</span><span>Text Diff</span></div>
+  <div class="nav-section">Azure</div>
+  <div class="nav-item" data-tool="azureguide"><span class="nav-icon">A</span><span>Azure Services Guide</span></div>
+  <div class="sidebar-footer">
+    <a href="https://carosrrr.github.io" target="_blank">carosrrr.github.io</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SUBNET CALCULATOR -->
+  <div class="tool-section active" id="tool-subnet">
+    <div class="tool-title">Subnet Calculator</div>
+    <div class="tool-desc">Enter a CIDR notation to calculate network details.</div>
+    <div class="input-group">
+      <label>CIDR Notation</label>
+      <input type="text" id="cidr-input" placeholder="10.0.1.0/24" value="10.0.1.0/24">
+    </div>
+    <button onclick="calcSubnet()">Calculate</button>
+    <div id="subnet-result"></div>
+  </div>
+
+  <!-- IP CONVERTER -->
+  <div class="tool-section" id="tool-ip">
+    <div class="tool-title">IP Converter</div>
+    <div class="tool-desc">Convert between decimal, binary, and hexadecimal IP formats.</div>
+    <div class="input-group">
+      <label>IP Address (decimal)</label>
+      <input type="text" id="ip-input" placeholder="192.168.1.1" value="192.168.1.1">
+    </div>
+    <button onclick="convertIP()">Convert</button>
+    <div id="ip-result"></div>
+  </div>
+
+  <!-- PORT LOOKUP -->
+  <div class="tool-section" id="tool-ports">
+    <div class="tool-title">Port Lookup</div>
+    <div class="tool-desc">Search common ports and services.</div>
+    <div class="input-group">
+      <label>Search by port number or service name</label>
+      <input type="text" id="port-input" placeholder="443 or https" oninput="searchPorts()">
+    </div>
+    <div id="port-result"></div>
+  </div>
+
+  <!-- PASSWORD GENERATOR -->
+  <div class="tool-section" id="tool-password">
+    <div class="tool-title">Password Generator</div>
+    <div class="tool-desc">Generate cryptographically secure passwords.</div>
+    <div class="input-row">
+      <div>
+        <label>Length</label>
+        <input type="range" id="pw-length" min="8" max="64" value="20" oninput="document.getElementById('pw-len-val').textContent=this.value; genPassword()">
+        <div style="text-align:center;color:var(--accent);font-family:var(--mono);font-size:1.2rem;margin-top:0.3rem" id="pw-len-val">20</div>
+      </div>
+      <div>
+        <label>Options</label>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.3rem">
+          <label style="display:flex;align-items:center;gap:0.5rem;text-transform:none;font-size:0.82rem;cursor:pointer">
+            <input type="checkbox" id="pw-upper" checked onchange="genPassword()"> Uppercase (A-Z)
+          </label>
+          <label style="display:flex;align-items:center;gap:0.5rem;text-transform:none;font-size:0.82rem;cursor:pointer">
+            <input type="checkbox" id="pw-lower" checked onchange="genPassword()"> Lowercase (a-z)
+          </label>
+          <label style="display:flex;align-items:center;gap:0.5rem;text-transform:none;font-size:0.82rem;cursor:pointer">
+            <input type="checkbox" id="pw-digits" checked onchange="genPassword()"> Numbers (0-9)
+          </label>
+          <label style="display:flex;align-items:center;gap:0.5rem;text-transform:none;font-size:0.82rem;cursor:pointer">
+            <input type="checkbox" id="pw-special" checked onchange="genPassword()"> Special (!@#$%&*)
+          </label>
+        </div>
+      </div>
+    </div>
+    <div id="pw-result"></div>
+    <div class="btn-row" style="margin-top:0.8rem">
+      <button onclick="genPassword()">Regenerate</button>
+    </div>
+  </div>
+
+  <!-- BASE64 -->
+  <div class="tool-section" id="tool-base64">
+    <div class="tool-title">Base64 Encode / Decode</div>
+    <div class="tool-desc">Convert text to and from Base64 encoding.</div>
+    <div class="input-group">
+      <label>Input</label>
+      <textarea id="b64-input" placeholder="Enter text to encode or Base64 to decode..." rows="4"></textarea>
+    </div>
+    <div class="btn-row">
+      <button onclick="b64Encode()">Encode</button>
+      <button onclick="b64Decode()">Decode</button>
+    </div>
+    <div id="b64-result"></div>
+  </div>
+
+  <!-- JSON FORMATTER -->
+  <div class="tool-section" id="tool-json">
+    <div class="tool-title">JSON Formatter</div>
+    <div class="tool-desc">Paste messy JSON and format it with proper indentation.</div>
+    <div class="input-group">
+      <label>Input JSON</label>
+      <textarea id="json-input" placeholder='{"name":"value","nested":{"key":"data"}}' rows="6"></textarea>
+    </div>
+    <div class="btn-row">
+      <button onclick="formatJSON()">Format (2 spaces)</button>
+      <button onclick="formatJSON(4)">Format (4 spaces)</button>
+      <button onclick="minifyJSON()">Minify</button>
+    </div>
+    <div id="json-result"></div>
+  </div>
+
+  <!-- REGEX TESTER -->
+  <div class="tool-section" id="tool-regex">
+    <div class="tool-title">Regex Tester</div>
+    <div class="tool-desc">Test regular expressions in real time with match highlighting.</div>
+    <div class="input-row">
+      <div style="flex:2">
+        <label>Pattern</label>
+        <input type="text" id="regex-pattern" placeholder="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" oninput="testRegex()">
+      </div>
+      <div style="flex:0.5">
+        <label>Flags</label>
+        <input type="text" id="regex-flags" value="gi" placeholder="gi" oninput="testRegex()">
+      </div>
+    </div>
+    <div class="input-group">
+      <label>Test String</label>
+      <textarea id="regex-input" rows="4" placeholder="Server 192.168.1.1 responded to 10.0.0.5 on port 443" oninput="testRegex()"></textarea>
+    </div>
+    <div id="regex-result"></div>
+  </div>
+
+  <!-- CLI CHEATSHEET -->
+  <div class="tool-section" id="tool-cheat">
+    <div class="tool-title">PowerShell & Azure CLI Cheatsheet</div>
+    <div class="tool-desc">Quick reference with copy-to-clipboard. Click any command to copy.</div>
+    <div class="cheat-search">
+      <input type="text" id="cheat-search" placeholder="Search commands..." oninput="filterCheat()">
+    </div>
+    <div id="cheat-content"></div>
+  </div>
+
+  <!-- SLA CALCULATOR -->
+  <div class="tool-section" id="tool-sla">
+    <div class="tool-title">SLA Calculator</div>
+    <div class="tool-desc">Calculate composite SLA from multiple services in a dependency chain.</div>
+    <div id="sla-services">
+      <div class="sla-service">
+        <input type="text" placeholder="Service name" value="Azure App Service">
+        <input type="number" step="0.01" min="0" max="100" value="99.95" style="width:110px">
+        <span style="color:var(--text3);font-size:0.85rem">%</span>
+        <button class="sla-remove btn-sm" onclick="this.parentElement.remove();calcSLA()">x</button>
+      </div>
+      <div class="sla-service">
+        <input type="text" placeholder="Service name" value="Azure SQL Database">
+        <input type="number" step="0.01" min="0" max="100" value="99.99" style="width:110px">
+        <span style="color:var(--text3);font-size:0.85rem">%</span>
+        <button class="sla-remove btn-sm" onclick="this.parentElement.remove();calcSLA()">x</button>
+      </div>
+      <div class="sla-service">
+        <input type="text" placeholder="Service name" value="Azure Storage">
+        <input type="number" step="0.01" min="0" max="100" value="99.9" style="width:110px">
+        <span style="color:var(--text3);font-size:0.85rem">%</span>
+        <button class="sla-remove btn-sm" onclick="this.parentElement.remove();calcSLA()">x</button>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:0.8rem">
+      <button onclick="addSLAService()">+ Add Service</button>
+      <button class="btn-fill" onclick="calcSLA()">Calculate</button>
+    </div>
+    <div id="sla-result"></div>
+  </div>
+
+  <!-- TEXT DIFF -->
+  <div class="tool-section" id="tool-diff">
+    <div class="tool-title">Text Diff</div>
+    <div class="tool-desc">Compare two texts and see the differences line by line.</div>
+    <div class="diff-container">
+      <div>
+        <label>Original</label>
+        <textarea id="diff-a" rows="8" placeholder="Paste original text..."></textarea>
+      </div>
+      <div>
+        <label>Modified</label>
+        <textarea id="diff-b" rows="8" placeholder="Paste modified text..."></textarea>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:1rem">
+      <button onclick="runDiff()">Compare</button>
+    </div>
+    <div id="diff-result"></div>
+  </div>
+
+  <!-- AZURE SERVICES GUIDE -->
+  <div class="tool-section" id="tool-azureguide">
+    <div class="tool-title">Azure Services Guide</div>
+    <div class="tool-desc">Browse Azure services by category. Click any service for details, tips, and common issues.</div>
+    <div class="input-group">
+      <label>Search services</label>
+      <input type="text" id="az-search" placeholder="Search by name or keyword (e.g., 'VM', 'database', 'container')..." oninput="filterAzure()">
+    </div>
+    <div id="az-list"></div>
+    <div id="az-detail" style="display:none"></div>
+  </div>
+
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
