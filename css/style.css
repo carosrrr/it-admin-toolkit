@@ -95,6 +95,29 @@
   .sla-remove { background:none; border:1px solid var(--red); color:var(--red); padding:0.3rem 0.6rem; font-size:0.75rem; }
   .sla-remove:hover { background:var(--red); color:var(--bg); }
 
+  /* Snippets */
+  .snippet-card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:1.1rem; margin-bottom:0.8rem; cursor:pointer; transition:all 0.2s; }
+  .snippet-card:hover { border-color:var(--accent); }
+  .snippet-title { font-weight:600; font-size:0.9rem; margin-bottom:0.3rem; display:flex; justify-content:space-between; align-items:center; }
+  .snippet-lang { font-family:var(--mono); font-size:0.65rem; padding:0.15rem 0.5rem; border-radius:4px; background:rgba(79,195,247,0.1); color:var(--blue); }
+  .snippet-desc { font-size:0.8rem; color:var(--text2); margin-bottom:0.6rem; }
+  .snippet-code { font-family:var(--mono); font-size:0.78rem; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:0.7rem; color:var(--accent); white-space:pre-wrap; word-break:break-all; line-height:1.5; }
+
+  /* CRON */
+  .cron-output { font-family:var(--mono); font-size:1.6rem; color:var(--accent); text-align:center; padding:1rem; background:var(--bg3); border:1px solid var(--border); border-radius:10px; margin:1rem 0; letter-spacing:4px; }
+  .cron-explain { font-size:0.85rem; color:var(--text2); text-align:center; margin-bottom:1rem; }
+
+  /* HTTP / DNS ref cards */
+  .ref-card { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:0.9rem 1.1rem; margin-bottom:0.5rem; display:flex; align-items:flex-start; gap:1rem; transition:background 0.15s; }
+  .ref-card:hover { background:var(--bg4); }
+  .ref-code { font-family:var(--mono); font-size:0.95rem; font-weight:600; min-width:50px; flex-shrink:0; }
+  .ref-body { flex:1; }
+  .ref-title { font-weight:500; font-size:0.88rem; }
+  .ref-desc { font-size:0.78rem; color:var(--text2); margin-top:0.2rem; line-height:1.5; }
+  .ref-example { font-family:var(--mono); font-size:0.75rem; color:var(--text3); margin-top:0.3rem; background:var(--bg); padding:0.3rem 0.5rem; border-radius:4px; display:inline-block; }
+  .ref-group-title { font-size:0.95rem; font-weight:600; color:var(--accent); margin:1.2rem 0 0.6rem; padding-bottom:0.3rem; border-bottom:1px solid var(--border); }
+  .ref-group-title:first-child { margin-top:0; }
+
   /* Responsive */
   .az-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:0.8rem; margin-bottom:1.5rem; }
   .az-card { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:1.1rem; cursor:pointer; transition:all 0.25s; }

@@ -645,3 +645,364 @@ function filterAzure() {
 }
 
 renderAzureList();
+// ============================================================
+// DNS RECORD REFERENCE
+// ============================================================
+var DNS_RECORDS = [
+  { type:"A", title:"Address Record", desc:"Maps a domain name to an IPv4 address.", example:"example.com. IN A 93.184.216.34" },
+  { type:"AAAA", title:"IPv6 Address Record", desc:"Maps a domain name to an IPv6 address.", example:"example.com. IN AAAA 2606:2800:220:1:248:1893:25c8:1946" },
+  { type:"CNAME", title:"Canonical Name", desc:"Creates an alias that points to another domain name. Cannot coexist with other records on the same name.", example:"www.example.com. IN CNAME example.com." },
+  { type:"MX", title:"Mail Exchange", desc:"Specifies the mail server responsible for receiving email. Priority number (lower = higher priority).", example:"example.com. IN MX 10 mail.example.com." },
+  { type:"TXT", title:"Text Record", desc:"Stores arbitrary text. Used for SPF (email auth), DKIM, domain verification (Azure, Google, etc.).", example:'example.com. IN TXT "v=spf1 include:_spf.google.com ~all"' },
+  { type:"NS", title:"Name Server", desc:"Delegates a domain to a set of authoritative DNS servers.", example:"example.com. IN NS ns1.example.com." },
+  { type:"SOA", title:"Start of Authority", desc:"Contains admin info about the zone: primary NS, admin email, serial number, refresh/retry timers.", example:"example.com. IN SOA ns1.example.com. admin.example.com. 2024010101 3600 900 1209600 86400" },
+  { type:"SRV", title:"Service Record", desc:"Specifies a host and port for specific services (e.g., SIP, XMPP, LDAP). Used by AD for domain controllers.", example:"_sip._tcp.example.com. IN SRV 10 60 5060 sipserver.example.com." },
+  { type:"PTR", title:"Pointer Record", desc:"Maps an IP address to a domain name (reverse DNS). Used for email server verification and diagnostics.", example:"34.216.184.93.in-addr.arpa. IN PTR example.com." },
+  { type:"CAA", title:"Certification Authority Authorization", desc:"Specifies which certificate authorities (CAs) are allowed to issue SSL certificates for the domain.", example:'example.com. IN CAA 0 issue "letsencrypt.org"' }
+];
+
+function filterDNS() {
+  var q = document.getElementById('dns-search').value.toLowerCase();
+  var html = '';
+  DNS_RECORDS.forEach(function(r) {
+    if (q && r.type.toLowerCase().indexOf(q) === -1 && r.title.toLowerCase().indexOf(q) === -1 && r.desc.toLowerCase().indexOf(q) === -1) return;
+    html += '<div class="ref-card">';
+    html += '<div class="ref-code" style="color:var(--accent)">' + r.type + '</div>';
+    html += '<div class="ref-body">';
+    html += '<div class="ref-title">' + r.title + '</div>';
+    html += '<div class="ref-desc">' + r.desc + '</div>';
+    html += '<div class="ref-example">' + r.example.replace(/</g,'&lt;') + '</div>';
+    html += '</div></div>';
+  });
+  if (!html) html = '<div style="color:var(--text3);padding:1rem">No records match.</div>';
+  document.getElementById('dns-list').innerHTML = html;
+}
+filterDNS();
+
+// ============================================================
+// HTTP STATUS CODES
+// ============================================================
+var HTTP_CODES = [
+  {g:"1xx Informational", codes:[
+    [100,"Continue","Server received headers, client should proceed with body."],
+    [101,"Switching Protocols","Server is switching protocols as requested (e.g., WebSocket upgrade)."],
+    [102,"Processing","Server is processing the request (WebDAV)."]
+  ]},
+  {g:"2xx Success", codes:[
+    [200,"OK","Request succeeded. Standard response for successful GET/POST."],
+    [201,"Created","Resource was successfully created (common after POST/PUT)."],
+    [202,"Accepted","Request accepted for processing, but not yet completed (async)."],
+    [204,"No Content","Success, but no response body (common after DELETE)."],
+    [206,"Partial Content","Server is delivering part of the resource (range request)."]
+  ]},
+  {g:"3xx Redirection", codes:[
+    [301,"Moved Permanently","Resource permanently moved. Update bookmarks/links. SEO transfers."],
+    [302,"Found","Temporary redirect. Client should continue using the original URL."],
+    [304,"Not Modified","Cached version is still valid. No body returned (saves bandwidth)."],
+    [307,"Temporary Redirect","Like 302, but method and body must not change."],
+    [308,"Permanent Redirect","Like 301, but method and body must not change."]
+  ]},
+  {g:"4xx Client Error", codes:[
+    [400,"Bad Request","Server cannot process due to malformed syntax, invalid parameters."],
+    [401,"Unauthorized","Authentication required. Missing or invalid credentials/token."],
+    [403,"Forbidden","Server understood but refuses. You have no permission (even with auth)."],
+    [404,"Not Found","Resource does not exist at the given URL."],
+    [405,"Method Not Allowed","HTTP method not supported for this endpoint (e.g., POST on GET-only)."],
+    [408,"Request Timeout","Server timed out waiting for the client request."],
+    [409,"Conflict","Request conflicts with current state (e.g., duplicate resource)."],
+    [413,"Payload Too Large","Request body exceeds server limits."],
+    [415,"Unsupported Media Type","Content-Type header is not supported by the endpoint."],
+    [429,"Too Many Requests","Rate limit exceeded. Retry after the period in Retry-After header."]
+  ]},
+  {g:"5xx Server Error", codes:[
+    [500,"Internal Server Error","Generic server error. Check server logs for details."],
+    [502,"Bad Gateway","Server acting as gateway received invalid response from upstream."],
+    [503,"Service Unavailable","Server temporarily overloaded or down for maintenance."],
+    [504,"Gateway Timeout","Gateway did not receive response from upstream in time."]
+  ]}
+];
+
+function filterHTTP() {
+  var q = document.getElementById('http-search').value.toLowerCase();
+  var html = '';
+  HTTP_CODES.forEach(function(group) {
+    var filtered = group.codes.filter(function(c) {
+      if (!q) return true;
+      return c[0].toString().indexOf(q) !== -1 || c[1].toLowerCase().indexOf(q) !== -1 || c[2].toLowerCase().indexOf(q) !== -1;
+    });
+    if (filtered.length === 0) return;
+    var color = group.g[0]==='1'?'var(--text2)':group.g[0]==='2'?'var(--accent)':group.g[0]==='3'?'var(--blue)':group.g[0]==='4'?'var(--yellow)':'var(--red)';
+    html += '<div class="ref-group-title">' + group.g + '</div>';
+    filtered.forEach(function(c) {
+      html += '<div class="ref-card">';
+      html += '<div class="ref-code" style="color:'+color+'">' + c[0] + '</div>';
+      html += '<div class="ref-body">';
+      html += '<div class="ref-title">' + c[1] + '</div>';
+      html += '<div class="ref-desc">' + c[2] + '</div>';
+      html += '</div></div>';
+    });
+  });
+  if (!html) html = '<div style="color:var(--text3);padding:1rem">No codes match.</div>';
+  document.getElementById('http-list').innerHTML = html;
+}
+filterHTTP();
+
+// ============================================================
+// BYTE / BANDWIDTH CONVERTER
+// ============================================================
+var BYTE_UNITS = {B:1, KB:1024, MB:1048576, GB:1073741824, TB:1099511627776, PB:1125899906842624};
+
+function convertBytes() {
+  var val = parseFloat(document.getElementById('byte-val').value);
+  var unit = document.getElementById('byte-unit').value;
+  if (isNaN(val) || val < 0) return;
+  var bytes = val * BYTE_UNITS[unit];
+  var html = '<div class="result-grid">';
+  for (var u in BYTE_UNITS) {
+    var converted = bytes / BYTE_UNITS[u];
+    var display = converted >= 1 ? converted.toLocaleString(undefined, {maximumFractionDigits:4}) : converted.toExponential(2);
+    var isActive = u === unit ? ';border-color:var(--accent)' : '';
+    html += '<div class="result-card" style="' + isActive + '"><div class="val">' + display + '</div><div class="lbl">' + u + '</div></div>';
+  }
+  html += '</div>';
+  // Also show bits
+  html += '<div style="margin-top:0.8rem;font-size:0.8rem;color:var(--text3)">= ' + (bytes*8).toLocaleString() + ' bits | ' + bytes.toLocaleString() + ' bytes</div>';
+  document.getElementById('bytes-result').innerHTML = html;
+}
+convertBytes();
+
+function calcTransfer() {
+  var size = parseFloat(document.getElementById('xfer-size').value);
+  var unit = document.getElementById('xfer-unit').value;
+  var speedMbps = parseFloat(document.getElementById('xfer-speed').value);
+  if (isNaN(size) || isNaN(speedMbps) || size <= 0 || speedMbps <= 0) return;
+  var bytes = size * BYTE_UNITS[unit];
+  var bits = bytes * 8;
+  var speedBps = speedMbps * 1000000;
+  var seconds = bits / speedBps;
+  var h = Math.floor(seconds / 3600);
+  var m = Math.floor((seconds % 3600) / 60);
+  var s = Math.floor(seconds % 60);
+  var timeStr = '';
+  if (h > 0) timeStr += h + 'h ';
+  if (m > 0) timeStr += m + 'm ';
+  timeStr += s + 's';
+  document.getElementById('xfer-result').innerHTML = '<div class="result-grid" style="margin-top:0.5rem"><div class="result-card"><div class="val">' + timeStr + '</div><div class="lbl">Transfer Time</div></div><div class="result-card"><div class="val">' + (speedMbps/8).toFixed(1) + ' MB/s</div><div class="lbl">Actual Throughput</div></div></div>';
+}
+calcTransfer();
+
+// ============================================================
+// CRON BUILDER
+// ============================================================
+function buildCron() {
+  var min = document.getElementById('cron-min').value || '*';
+  var hour = document.getElementById('cron-hour').value || '*';
+  var dom = document.getElementById('cron-dom').value || '*';
+  var month = document.getElementById('cron-month').value || '*';
+  var dow = document.getElementById('cron-dow').value || '*';
+  var expr = min + ' ' + hour + ' ' + dom + ' ' + month + ' ' + dow;
+
+  var explain = describeCron(min, hour, dom, month, dow);
+
+  var html = '<div class="cron-output">' + expr + '</div>';
+  html += '<div class="cron-explain">' + explain + '</div>';
+  html += '<div class="result" style="font-size:0.8rem"><button class="copy-btn btn-sm" onclick="copyText(\'' + expr + '\')">Copy</button>';
+  html += '<strong>Usage:</strong><br>';
+  html += 'Linux crontab: <span style="color:var(--accent)">' + expr + ' /path/to/script.sh</span><br>';
+  html += 'Azure Functions: <span style="color:var(--accent)">0 ' + expr + '</span> (6 fields, add seconds=0)<br>';
+  html += 'GitHub Actions: <span style="color:var(--accent)">cron: \'' + expr + '\'</span><br>';
+  html += 'Azure Automation: <span style="color:var(--accent)">New-AzAutomationSchedule ... -HourInterval / -DayInterval</span>';
+  html += '</div>';
+  document.getElementById('cron-result').innerHTML = html;
+}
+
+function describeCron(min, hour, dom, month, dow) {
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var parts = [];
+  if (min.indexOf('*/') === 0) parts.push('Every ' + min.slice(2) + ' minutes');
+  else if (min !== '*') parts.push('At minute ' + min);
+  if (hour.indexOf('*/') === 0) parts.push('every ' + hour.slice(2) + ' hours');
+  else if (hour !== '*') parts.push('at ' + hour + ':' + (min === '*' ? '00' : (min.length===1?'0'+min:min)));
+  if (dom !== '*') parts.push('on day ' + dom + ' of the month');
+  if (month !== '*') parts.push('in month ' + month);
+  if (dow !== '*') {
+    var dayNames = dow.split(',').map(function(d) {
+      if (d.indexOf('-') !== -1) {
+        var range = d.split('-');
+        return (days[parseInt(range[0])] || range[0]) + ' to ' + (days[parseInt(range[1])] || range[1]);
+      }
+      return days[parseInt(d)] || d;
+    }).join(', ');
+    parts.push('on ' + dayNames);
+  }
+  return parts.length > 0 ? parts.join(', ') : 'Every minute';
+}
+
+function setCronPreset(expr) {
+  var p = expr.split(' ');
+  document.getElementById('cron-min').value = p[0];
+  document.getElementById('cron-hour').value = p[1];
+  document.getElementById('cron-dom').value = p[2];
+  document.getElementById('cron-month').value = p[3];
+  document.getElementById('cron-dow').value = p[4];
+  buildCron();
+}
+buildCron();
+
+// ============================================================
+// SCRIPT SNIPPETS LIBRARY
+// ============================================================
+var SNIPPETS = [
+  {cat:"User Management",lang:"PowerShell (Graph)",title:"Get all users without MFA",
+    desc:"Lists enabled users who haven't registered MFA.",
+    code:"Connect-MgGraph -Scopes 'UserAuthenticationMethod.Read.All'\n$report = Get-MgReportAuthenticationMethodUserRegistrationDetail -All\n$report | Where-Object { $_.IsMfaRegistered -eq $false } |\n  Select-Object UserPrincipalName, IsMfaRegistered | Format-Table"},
+  {cat:"User Management",lang:"PowerShell (Graph)",title:"Disable user and revoke sessions",
+    code:"$upn = 'user@company.com'\nUpdate-MgUser -UserId $upn -AccountEnabled:$false\nRevoke-MgUserSignInSession -UserId $upn\nWrite-Host \"User $upn disabled and sessions revoked\""},
+  {cat:"User Management",lang:"PowerShell (Graph)",title:"Bulk assign license from CSV",
+    code:"$skuId = '6fd2c87f-b296-42f0-b197-1e91e994b900' # E3\n$users = Import-Csv 'users.csv' # column: UserPrincipalName\nforeach ($u in $users) {\n  Set-MgUserLicense -UserId $u.UserPrincipalName `\n    -AddLicenses @(@{SkuId=$skuId}) -RemoveLicenses @()\n  Write-Host \"Licensed: $($u.UserPrincipalName)\"\n}"},
+  {cat:"User Management",lang:"Azure CLI",title:"List all Global Admins",
+    code:'az rest --method GET \\\n  --url "https://graph.microsoft.com/v1.0/directoryRoles" \\\n  --query "value[?displayName==\'Global Administrator\'].id" -o tsv | \\\n  xargs -I {} az rest --method GET \\\n  --url "https://graph.microsoft.com/v1.0/directoryRoles/{}/members" \\\n  --query "value[].displayName" -o tsv'},
+  {cat:"Device Management",lang:"PowerShell (Graph)",title:"Get non-compliant Intune devices",
+    code:"Connect-MgGraph -Scopes 'DeviceManagementManagedDevices.Read.All'\nGet-MgDeviceManagementManagedDevice -All -Filter \"complianceState eq 'noncompliant'\" |\n  Select-Object DeviceName, UserPrincipalName, ComplianceState, OsVersion |\n  Format-Table"},
+  {cat:"Device Management",lang:"PowerShell (Graph)",title:"Find stale devices (no sync 30+ days)",
+    code:"$staleDate = (Get-Date).AddDays(-30).ToString('yyyy-MM-ddTHH:mm:ssZ')\nGet-MgDeviceManagementManagedDevice -All |\n  Where-Object { $_.LastSyncDateTime -lt $staleDate } |\n  Select-Object DeviceName, UserPrincipalName, LastSyncDateTime |\n  Sort-Object LastSyncDateTime | Format-Table"},
+  {cat:"System Info",lang:"PowerShell",title:"Get disk space on remote machine",
+    code:"$computer = 'SERVER-01'\nGet-WmiObject Win32_LogicalDisk -ComputerName $computer -Filter 'DriveType=3' |\n  Select-Object DeviceID,\n    @{N='SizeGB';E={[math]::Round($_.Size/1GB,1)}},\n    @{N='FreeGB';E={[math]::Round($_.FreeSpace/1GB,1)}},\n    @{N='UsedPct';E={[math]::Round(($_.Size-$_.FreeSpace)/$_.Size*100,1)}} |\n  Format-Table"},
+  {cat:"System Info",lang:"PowerShell",title:"Get uptime of remote machine",
+    code:"$computer = 'SERVER-01'\n$os = Get-WmiObject Win32_OperatingSystem -ComputerName $computer\n$boot = $os.ConvertToDateTime($os.LastBootUpTime)\n$uptime = (Get-Date) - $boot\nWrite-Host \"$computer uptime: $($uptime.Days)d $($uptime.Hours)h $($uptime.Minutes)m\""},
+  {cat:"Networking",lang:"PowerShell",title:"Test connectivity to multiple ports",
+    code:"$target = 'server.company.com'\n$ports = @(22, 80, 443, 3389, 5985)\nforeach ($port in $ports) {\n  $result = Test-NetConnection -ComputerName $target -Port $port -WarningAction SilentlyContinue\n  $status = if ($result.TcpTestSucceeded) { 'OPEN' } else { 'CLOSED' }\n  Write-Host \"Port ${port}: $status\"\n}"},
+  {cat:"Networking",lang:"Bash",title:"Quick DNS lookup for all record types",
+    code:"DOMAIN='example.com'\nfor TYPE in A AAAA CNAME MX TXT NS SOA; do\n  echo \"--- $TYPE ---\"\n  dig +short $DOMAIN $TYPE\n  echo ''\ndone"},
+  {cat:"Azure",lang:"Azure CLI",title:"Find unused (unattached) disks",
+    code:"az disk list --query \"[?managedBy==null].{Name:name, RG:resourceGroup, SizeGB:diskSizeGb, State:diskState}\" -o table"},
+  {cat:"Azure",lang:"Azure CLI",title:"List all VMs with their power state",
+    code:"az vm list -d --query \"[].{Name:name, RG:resourceGroup, State:powerState, Size:hardwareProfile.vmSize, OS:storageProfile.osDisk.osType}\" -o table"},
+  {cat:"Azure",lang:"Terraform",title:"Create resource group + VNet",
+    code:'resource "azurerm_resource_group" "main" {\n  name     = "rg-myproject-dev"\n  location = "eastus"\n}\n\nresource "azurerm_virtual_network" "main" {\n  name                = "vnet-myproject-dev"\n  resource_group_name = azurerm_resource_group.main.name\n  location            = azurerm_resource_group.main.location\n  address_space       = ["10.0.0.0/16"]\n}'},
+  {cat:"Docker",lang:"Bash",title:"Clean up all Docker resources",
+    code:"# Remove stopped containers\ndocker container prune -f\n# Remove unused images\ndocker image prune -a -f\n# Remove unused volumes\ndocker volume prune -f\n# Remove unused networks\ndocker network prune -f\n# Nuclear option: everything\n# docker system prune -a --volumes -f"},
+  {cat:"Docker",lang:"Dockerfile",title:"Multi-stage Python build template",
+    code:"FROM python:3.12-slim AS builder\nWORKDIR /build\nCOPY requirements.txt .\nRUN pip install --no-cache-dir --prefix=/install -r requirements.txt\n\nFROM python:3.12-slim\nRUN groupadd -r app && useradd -r -g app app\nWORKDIR /app\nCOPY --from=builder /install /usr/local\nCOPY . .\nUSER app\nEXPOSE 8080\nCMD [\"gunicorn\", \"--bind\", \"0.0.0.0:8080\", \"app:app\"]"}
+];
+
+function filterSnippets() {
+  var q = document.getElementById('snippet-search').value.toLowerCase();
+  var cats = {};
+  SNIPPETS.forEach(function(s) {
+    if (q && s.title.toLowerCase().indexOf(q) === -1 && s.cat.toLowerCase().indexOf(q) === -1 && (s.desc||'').toLowerCase().indexOf(q) === -1 && s.code.toLowerCase().indexOf(q) === -1 && s.lang.toLowerCase().indexOf(q) === -1) return;
+    if (!cats[s.cat]) cats[s.cat] = [];
+    cats[s.cat].push(s);
+  });
+  var html = '';
+  for (var cat in cats) {
+    html += '<div class="ref-group-title">' + cat + '</div>';
+    cats[cat].forEach(function(s) {
+      var escaped = s.code.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
+      html += '<div class="snippet-card" onclick="copyText(\'' + escaped + '\')">';
+      html += '<div class="snippet-title"><span>' + s.title + '</span><span class="snippet-lang">' + s.lang + '</span></div>';
+      if (s.desc) html += '<div class="snippet-desc">' + s.desc + '</div>';
+      html += '<div class="snippet-code">' + s.code.replace(/</g,'&lt;') + '</div>';
+      html += '</div>';
+    });
+  }
+  if (!html) html = '<div style="color:var(--text3);padding:1rem">No snippets match.</div>';
+  document.getElementById('snippet-list').innerHTML = html;
+}
+filterSnippets();
+
+// ============================================================
+// REMOTE MACHINE INFO COMMANDS
+// ============================================================
+var REMOTE_CMDS = [
+  {cat:"System Info", cmds:[
+    {title:"Computer name and OS", cmd:"Get-WmiObject Win32_OperatingSystem -ComputerName {HOST} | Select-Object CSName, Caption, Version, OSArchitecture"},
+    {title:"Uptime / last boot", cmd:"Get-WmiObject Win32_OperatingSystem -ComputerName {HOST} | Select-Object @{N='LastBoot';E={$_.ConvertToDateTime($_.LastBootUpTime)}}"},
+    {title:"Hardware info (CPU, RAM)", cmd:"Get-WmiObject Win32_ComputerSystem -ComputerName {HOST} | Select-Object Manufacturer, Model, @{N='RAM_GB';E={[math]::Round($_.TotalPhysicalMemory/1GB,1)}}, NumberOfProcessors"},
+    {title:"Installed RAM modules", cmd:"Get-WmiObject Win32_PhysicalMemory -ComputerName {HOST} | Select-Object BankLabel, @{N='GB';E={$_.Capacity/1GB}}, Speed"}
+  ]},
+  {cat:"Disk & Storage", cmds:[
+    {title:"Disk space (all drives)", cmd:"Get-WmiObject Win32_LogicalDisk -ComputerName {HOST} -Filter 'DriveType=3' | Select-Object DeviceID, @{N='SizeGB';E={[math]::Round($_.Size/1GB,1)}}, @{N='FreeGB';E={[math]::Round($_.FreeSpace/1GB,1)}}"},
+    {title:"Physical disks", cmd:"Get-WmiObject Win32_DiskDrive -ComputerName {HOST} | Select-Object Model, @{N='SizeGB';E={[math]::Round($_.Size/1GB)}}, MediaType"}
+  ]},
+  {cat:"Network", cmds:[
+    {title:"IP configuration", cmd:"Get-WmiObject Win32_NetworkAdapterConfiguration -ComputerName {HOST} -Filter 'IPEnabled=True' | Select-Object Description, IPAddress, DefaultIPGateway, DNSServerSearchOrder"},
+    {title:"Ping test", cmd:"Test-Connection -ComputerName {HOST} -Count 4"},
+    {title:"Test specific ports", cmd:"@(22,80,443,3389,5985) | ForEach-Object { $r = Test-NetConnection -ComputerName {HOST} -Port $_ -WarningAction SilentlyContinue; Write-Host \"Port $($_): $($r.TcpTestSucceeded)\" }"}
+  ]},
+  {cat:"Processes & Services", cmds:[
+    {title:"Top 10 processes by memory", cmd:"Invoke-Command -ComputerName {HOST} -ScriptBlock { Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 10 Name, @{N='MemMB';E={[math]::Round($_.WorkingSet64/1MB)}} }"},
+    {title:"List running services", cmd:"Get-Service -ComputerName {HOST} | Where-Object Status -eq 'Running' | Select-Object Name, DisplayName | Sort-Object DisplayName"},
+    {title:"Restart a service", cmd:"Get-Service -ComputerName {HOST} -Name 'Spooler' | Restart-Service -Force"}
+  ]},
+  {cat:"Event Logs", cmds:[
+    {title:"Last 20 system errors", cmd:"Get-EventLog -ComputerName {HOST} -LogName System -EntryType Error -Newest 20 | Select-Object TimeGenerated, Source, Message"},
+    {title:"Last 10 application warnings", cmd:"Get-EventLog -ComputerName {HOST} -LogName Application -EntryType Warning -Newest 10 | Select-Object TimeGenerated, Source, Message"}
+  ]}
+];
+
+function renderRemote() {
+  var host = document.getElementById('remote-host').value || 'COMPUTER-NAME';
+  var html = '';
+  REMOTE_CMDS.forEach(function(group) {
+    html += '<div class="ref-group-title">' + group.cat + '</div>';
+    group.cmds.forEach(function(c) {
+      var cmd = c.cmd.replace(/\{HOST\}/g, host);
+      var escaped = cmd.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
+      html += '<div class="snippet-card" onclick="copyText(\'' + escaped + '\')">';
+      html += '<div class="snippet-title"><span>' + c.title + '</span><span class="snippet-lang">PowerShell</span></div>';
+      html += '<div class="snippet-code">' + cmd.replace(/</g,'&lt;') + '</div>';
+      html += '</div>';
+    });
+  });
+  document.getElementById('remote-list').innerHTML = html;
+}
+renderRemote();
+
+// ============================================================
+// UPTIME / DOWNTIME CALCULATOR
+// ============================================================
+function calcUptime() {
+  var sla = parseFloat(document.getElementById('uptime-sla').value);
+  var period = document.getElementById('uptime-period').value;
+  if (isNaN(sla) || sla < 0 || sla > 100) return;
+
+  var totalMinutes = {day:1440, week:10080, month:43200, year:525600}[period];
+  var periodLabel = {day:'Day', week:'Week', month:'Month (30d)', year:'Year'}[period];
+  var downtimeMinutes = totalMinutes * (1 - sla/100);
+  var uptimeMinutes = totalMinutes - downtimeMinutes;
+
+  function fmtTime(mins) {
+    if (mins < 1) return (mins * 60).toFixed(1) + ' seconds';
+    if (mins < 60) return mins.toFixed(1) + ' minutes';
+    if (mins < 1440) return (mins/60).toFixed(1) + ' hours';
+    return (mins/1440).toFixed(1) + ' days';
+  }
+
+  var color = sla >= 99.9 ? 'var(--accent)' : sla >= 99 ? 'var(--yellow)' : 'var(--red)';
+
+  var html = '<div class="result-grid">';
+  html += '<div class="result-card"><div class="val" style="color:'+color+'">' + sla + '%</div><div class="lbl">SLA Uptime</div></div>';
+  html += '<div class="result-card"><div class="val">' + (100-sla).toFixed(4) + '%</div><div class="lbl">Downtime Percentage</div></div>';
+  html += '<div class="result-card"><div class="val">' + fmtTime(downtimeMinutes) + '</div><div class="lbl">Allowed Downtime / ' + periodLabel + '</div></div>';
+  html += '<div class="result-card"><div class="val">' + fmtTime(uptimeMinutes) + '</div><div class="lbl">Required Uptime / ' + periodLabel + '</div></div>';
+  html += '</div>';
+
+  // Reference table
+  html += '<div style="margin-top:1.5rem"><div class="result-label">Common SLA Tiers</div></div>';
+  var tiers = [
+    [99, 'Two Nines'], [99.5, 'Two and a Half Nines'], [99.9, 'Three Nines'],
+    [99.95, 'Three and a Half Nines'], [99.99, 'Four Nines'], [99.999, 'Five Nines']
+  ];
+  tiers.forEach(function(t) {
+    var dt = totalMinutes * (1 - t[0]/100);
+    var marker = Math.abs(sla - t[0]) < 0.005 ? ' style="color:var(--accent);font-weight:600"' : ' style="color:var(--text3)"';
+    html += '<div class="ref-card"' + marker + '>';
+    html += '<div class="ref-code" style="min-width:70px">' + t[0] + '%</div>';
+    html += '<div class="ref-body"><div class="ref-title">' + t[1] + '</div>';
+    html += '<div class="ref-desc">Max downtime: ' + fmtTime(dt) + ' per ' + periodLabel.toLowerCase() + '</div></div></div>';
+  });
+
+  document.getElementById('uptime-result').innerHTML = html;
+}
+calcUptime();

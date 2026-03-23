@@ -1,6 +1,6 @@
 # IT Admin Toolkit
 
-A browser-based toolkit with 11 tools built for IT Admins, Cloud Engineers, and DevOps professionals. Runs entirely in the browser with zero dependencies and no backend required.
+A browser-based toolkit with 18 tools built for IT Admins, Cloud Engineers, and DevOps professionals. Runs entirely in the browser with zero dependencies and no backend required.
 
 **Live Demo:** [https://carosrrr.github.io/it-admin-toolkit](https://carosrrr.github.io/it-admin-toolkit)
 
@@ -10,16 +10,23 @@ A browser-based toolkit with 11 tools built for IT Admins, Cloud Engineers, and 
 - **Subnet Calculator** - Enter CIDR notation, get network/broadcast address, usable range, mask in decimal and binary
 - **IP Converter** - Convert IPs between decimal, binary, hex. Shows class, private/public type, and integer value
 - **Port Lookup** - Search 40+ common ports by number or service name
+- **DNS Reference** - All DNS record types (A, AAAA, CNAME, MX, TXT, NS, SOA, SRV, PTR, CAA) with real-world examples
+- **HTTP Status Codes** - Searchable reference for all HTTP status codes grouped by category with descriptions
 
 ### Utilities
 - **Password Generator** - Cryptographically secure passwords with configurable length, complexity, entropy calculation, and strength meter
 - **Base64 Encode/Decode** - Convert text to and from Base64 with one-click copy
 - **JSON Formatter** - Paste messy JSON, format with 2 or 4 spaces, or minify. Shows key count and size
 - **Regex Tester** - Live match highlighting, capture group display, configurable flags
+- **Byte Converter** - Convert between B/KB/MB/GB/TB/PB with transfer time calculator for any bandwidth speed
+- **CRON Builder** - Visual CRON expression builder with presets, human-readable descriptions, and usage examples for Azure Functions, GitHub Actions, and Linux crontab
 
 ### Reference
 - **CLI Cheatsheet** - 60+ commands for Azure CLI, PowerShell Graph API, Az Module, Terraform, and Docker. Searchable with click-to-copy
+- **Script Snippets Library** - 15+ ready-to-use scripts for user management, device management, networking, Azure, and Docker. Click to copy
+- **Remote Machine Info** - Commands to gather system info, disk space, network config, processes, and event logs from remote machines. Auto-replaces hostname
 - **SLA Calculator** - Add Azure services to a dependency chain, calculate composite SLA, monthly/yearly downtime, with reference table
+- **Uptime Calculator** - Convert between SLA percentage and actual downtime per day/week/month/year with common SLA tier reference
 - **Text Diff** - Line-by-line comparison of two texts with added/removed/unchanged highlighting
 
 ### Azure

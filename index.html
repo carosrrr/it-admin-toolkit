@@ -17,14 +17,21 @@
   <div class="nav-item active" data-tool="subnet"><span class="nav-icon">#</span><span>Subnet Calculator</span></div>
   <div class="nav-item" data-tool="ip"><span class="nav-icon">&lt;&gt;</span><span>IP Converter</span></div>
   <div class="nav-item" data-tool="ports"><span class="nav-icon">:</span><span>Port Lookup</span></div>
+  <div class="nav-item" data-tool="dns"><span class="nav-icon">@</span><span>DNS Reference</span></div>
+  <div class="nav-item" data-tool="http"><span class="nav-icon">!</span><span>HTTP Status Codes</span></div>
   <div class="nav-section">Utilities</div>
   <div class="nav-item" data-tool="password"><span class="nav-icon">*</span><span>Password Generator</span></div>
   <div class="nav-item" data-tool="base64"><span class="nav-icon">B</span><span>Base64 Codec</span></div>
   <div class="nav-item" data-tool="json"><span class="nav-icon">{}</span><span>JSON Formatter</span></div>
   <div class="nav-item" data-tool="regex"><span class="nav-icon">.*</span><span>Regex Tester</span></div>
+  <div class="nav-item" data-tool="bytes"><span class="nav-icon">kb</span><span>Byte Converter</span></div>
+  <div class="nav-item" data-tool="cron"><span class="nav-icon">**</span><span>CRON Builder</span></div>
   <div class="nav-section">Reference</div>
   <div class="nav-item" data-tool="cheat"><span class="nav-icon">&gt;_</span><span>CLI Cheatsheet</span></div>
+  <div class="nav-item" data-tool="snippets"><span class="nav-icon">&lt;/&gt;</span><span>Script Snippets</span></div>
+  <div class="nav-item" data-tool="remote"><span class="nav-icon">PC</span><span>Remote Info Cmds</span></div>
   <div class="nav-item" data-tool="sla"><span class="nav-icon">%</span><span>SLA Calculator</span></div>
+  <div class="nav-item" data-tool="uptime"><span class="nav-icon">up</span><span>Uptime Calculator</span></div>
   <div class="nav-item" data-tool="diff"><span class="nav-icon">~</span><span>Text Diff</span></div>
   <div class="nav-section">Azure</div>
   <div class="nav-item" data-tool="azureguide"><span class="nav-icon">A</span><span>Azure Services Guide</span></div>
@@ -215,6 +222,155 @@
       <button onclick="runDiff()">Compare</button>
     </div>
     <div id="diff-result"></div>
+  </div>
+
+  <!-- DNS REFERENCE -->
+  <div class="tool-section" id="tool-dns">
+    <div class="tool-title">DNS Record Reference</div>
+    <div class="tool-desc">Types of DNS records with explanations and real-world examples.</div>
+    <div class="input-group">
+      <label>Search records</label>
+      <input type="text" id="dns-search" placeholder="Search by type or description (e.g., 'MX', 'mail')..." oninput="filterDNS()">
+    </div>
+    <div id="dns-list"></div>
+  </div>
+
+  <!-- HTTP STATUS CODES -->
+  <div class="tool-section" id="tool-http">
+    <div class="tool-title">HTTP Status Code Reference</div>
+    <div class="tool-desc">Search by code number or description.</div>
+    <div class="input-group">
+      <label>Search</label>
+      <input type="text" id="http-search" placeholder="200, 404, redirect, forbidden..." oninput="filterHTTP()">
+    </div>
+    <div id="http-list"></div>
+  </div>
+
+  <!-- BYTE CONVERTER -->
+  <div class="tool-section" id="tool-bytes">
+    <div class="tool-title">Byte &amp; Bandwidth Converter</div>
+    <div class="tool-desc">Convert between storage units and calculate transfer times.</div>
+    <div class="input-row">
+      <div>
+        <label>Value</label>
+        <input type="number" id="byte-val" value="1" min="0" step="any" oninput="convertBytes()">
+      </div>
+      <div>
+        <label>Unit</label>
+        <select id="byte-unit" onchange="convertBytes()">
+          <option value="B">Bytes (B)</option>
+          <option value="KB">Kilobytes (KB)</option>
+          <option value="MB" selected>Megabytes (MB)</option>
+          <option value="GB">Gigabytes (GB)</option>
+          <option value="TB">Terabytes (TB)</option>
+          <option value="PB">Petabytes (PB)</option>
+        </select>
+      </div>
+    </div>
+    <div id="bytes-result"></div>
+    <div style="margin-top:1.5rem">
+      <label>Transfer Time Calculator</label>
+      <div class="input-row" style="margin-top:0.5rem">
+        <div>
+          <label style="font-size:0.7rem">File Size</label>
+          <input type="number" id="xfer-size" value="1" min="0" step="any" oninput="calcTransfer()">
+        </div>
+        <div>
+          <label style="font-size:0.7rem">Unit</label>
+          <select id="xfer-unit" onchange="calcTransfer()">
+            <option value="MB">MB</option>
+            <option value="GB" selected>GB</option>
+            <option value="TB">TB</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.7rem">Speed (Mbps)</label>
+          <input type="number" id="xfer-speed" value="100" min="1" step="any" oninput="calcTransfer()">
+        </div>
+      </div>
+      <div id="xfer-result"></div>
+    </div>
+  </div>
+
+  <!-- CRON BUILDER -->
+  <div class="tool-section" id="tool-cron">
+    <div class="tool-title">CRON Expression Builder</div>
+    <div class="tool-desc">Build CRON expressions visually. Works with Azure Functions, Automation, Linux crontab, and GitHub Actions.</div>
+    <div class="input-row">
+      <div>
+        <label>Minute (0-59)</label>
+        <input type="text" id="cron-min" value="0" oninput="buildCron()">
+      </div>
+      <div>
+        <label>Hour (0-23)</label>
+        <input type="text" id="cron-hour" value="8" oninput="buildCron()">
+      </div>
+      <div>
+        <label>Day of Month (1-31)</label>
+        <input type="text" id="cron-dom" value="*" oninput="buildCron()">
+      </div>
+      <div>
+        <label>Month (1-12)</label>
+        <input type="text" id="cron-month" value="*" oninput="buildCron()">
+      </div>
+      <div>
+        <label>Day of Week (0-6)</label>
+        <input type="text" id="cron-dow" value="1" oninput="buildCron()">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sm" onclick="setCronPreset('0 8 * * 1-5')">Weekdays 8AM</button>
+      <button class="btn-sm" onclick="setCronPreset('0 0 * * *')">Daily midnight</button>
+      <button class="btn-sm" onclick="setCronPreset('*/5 * * * *')">Every 5 min</button>
+      <button class="btn-sm" onclick="setCronPreset('0 */2 * * *')">Every 2 hours</button>
+      <button class="btn-sm" onclick="setCronPreset('0 8 * * 1')">Monday 8AM</button>
+      <button class="btn-sm" onclick="setCronPreset('0 0 1 * *')">Monthly 1st</button>
+    </div>
+    <div id="cron-result"></div>
+  </div>
+
+  <!-- SCRIPT SNIPPETS -->
+  <div class="tool-section" id="tool-snippets">
+    <div class="tool-title">Script Snippets Library</div>
+    <div class="tool-desc">Ready-to-use scripts for common IT admin tasks. Click any snippet to copy.</div>
+    <div class="input-group">
+      <label>Search snippets</label>
+      <input type="text" id="snippet-search" placeholder="Search by task (e.g., 'disable user', 'disk space', 'restart')..." oninput="filterSnippets()">
+    </div>
+    <div id="snippet-list"></div>
+  </div>
+
+  <!-- REMOTE MACHINE INFO -->
+  <div class="tool-section" id="tool-remote">
+    <div class="tool-title">Remote Machine Info Commands</div>
+    <div class="tool-desc">Commands to gather information from remote machines. Click to copy.</div>
+    <div class="input-group">
+      <label>Target Machine (used in commands)</label>
+      <input type="text" id="remote-host" value="COMPUTER-NAME" oninput="renderRemote()" placeholder="Enter hostname or IP...">
+    </div>
+    <div id="remote-list"></div>
+  </div>
+
+  <!-- UPTIME CALCULATOR -->
+  <div class="tool-section" id="tool-uptime">
+    <div class="tool-title">Uptime / Downtime Calculator</div>
+    <div class="tool-desc">Convert between SLA percentage and actual downtime, or calculate allowed downtime from an SLA target.</div>
+    <div class="input-row">
+      <div>
+        <label>SLA Percentage</label>
+        <input type="number" id="uptime-sla" value="99.95" min="0" max="100" step="0.001" oninput="calcUptime()">
+      </div>
+      <div>
+        <label>Time Period</label>
+        <select id="uptime-period" onchange="calcUptime()">
+          <option value="day">Per Day</option>
+          <option value="week">Per Week</option>
+          <option value="month" selected>Per Month (30d)</option>
+          <option value="year">Per Year</option>
+        </select>
+      </div>
+    </div>
+    <div id="uptime-result"></div>
   </div>
 
   <!-- AZURE SERVICES GUIDE -->
